@@ -15,10 +15,13 @@ debootstrap_exclude='@debootstrapExcludeString@'
 
 usage() {
   cat <<'USAGE'
-Usage: helix-os-base [--output DIR] [--hostname NAME] [--root-password PASSWORD] [--skip-optional]
+Usage: helix-os-base [--output DIR] [--hostname NAME] [--root-password PASSWORD] [--root-password-hash HASH]
+                     [--login-user NAME] [--login-password PASSWORD] [--login-password-hash HASH]
+                     [--skip-optional]
 
 Creates a bootable Debian-based installer ISO using debootstrap.
-Defaults: --output ./artifacts, --hostname helix, --root-password helix
+Defaults: --output ./artifacts, --hostname helix, --root-password helix, --login-user helix,
+          --login-password helix
 USAGE
 }
 
@@ -26,6 +29,10 @@ USAGE
 workdir="$PWD/artifacts"
 hostname="helix"
 root_password="helix"
+root_password_hash=""
+login_user="helix"
+login_password="helix"
+login_password_hash=""
 install_optional=1
 
 # Parse CLI flags early so we can fail fast on unknown options.
@@ -41,6 +48,24 @@ while [ $# -gt 0 ]; do
       ;;
     --root-password)
       root_password="$2"
+      shift 2
+      ;;
+    --root-password-hash)
+      root_password_hash="$2"
+      root_password=""
+      shift 2
+      ;;
+    --login-user)
+      login_user="$2"
+      shift 2
+      ;;
+    --login-password)
+      login_password="$2"
+      shift 2
+      ;;
+    --login-password-hash)
+      login_password_hash="$2"
+      login_password=""
       shift 2
       ;;
     --skip-optional)
@@ -137,14 +162,23 @@ ExecStart=
 ExecStart=-/sbin/agetty --noclear --autologin root %I \$TERM
 EOF
 
-echo "root:$root_password" | chroot "$rootfs" chpasswd
+if [ -n "$root_password_hash" ]; then
+  echo "root:$root_password_hash" | chroot "$rootfs" chpasswd -e
+else
+  echo "root:$root_password" | chroot "$rootfs" chpasswd
+fi
 chroot "$rootfs" systemctl enable ssh.service >/dev/null 2>&1 || true
 
-# Add a default non-root user if it doesn't already exist.
-if ! chroot "$rootfs" id helix >/dev/null 2>&1; then
-  echo ">> Creating helix user"
-  chroot "$rootfs" useradd -m -s /bin/bash -G sudo helix
-  echo "helix:helix" | chroot "$rootfs" chpasswd
+if [ -n "$login_user" ]; then
+  if ! chroot "$rootfs" id "$login_user" >/dev/null 2>&1; then
+    echo ">> Creating $login_user user"
+    chroot "$rootfs" useradd -m -s /bin/bash -G sudo "$login_user"
+  fi
+  if [ -n "$login_password_hash" ]; then
+    echo "$login_user:$login_password_hash" | chroot "$rootfs" chpasswd -e
+  else
+    echo "$login_user:$login_password" | chroot "$rootfs" chpasswd
+  fi
 fi
 
 # systemd stores some core libraries in /usr/lib/...; copy them into /lib so

@@ -25,7 +25,6 @@
 
       packages.${system} = {
         helix-os-base = pkgs.callPackage ./flakes/helix-os-base.nix {};
-        helix-installer = pkgs.callPackage ./pkgs/helix-installer.nix {};
       };
 
       devShells.${system}.default =
