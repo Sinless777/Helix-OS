@@ -1,0 +1,10 @@
+[
+  "systemd-sysv"
+  "sudo"
+  "ca-certificates"
+  "curl"
+  "openssh-server"
+  "live-boot"
+  "live-config"
+  "live-config-systemd"
+]

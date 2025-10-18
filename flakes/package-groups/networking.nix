@@ -1,0 +1,16 @@
+[
+  "curl"
+  "openssh-server"
+  "ca-certificates"
+  "iputils-ping"
+  "net-tools"
+  "wireless-tools"
+  "dnsutils"
+  "ethtool"
+  "traceroute"
+  "nmap"
+  "tcpdump"
+  "iperf3"
+  "openvpn"
+  "wireguard"
+]

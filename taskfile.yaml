@@ -8,27 +8,22 @@ tasks:
       - task: list
 
   build:
-    desc: "Produce a minimal Debian rootfs tarball for Helix"
+    desc: "Produce a bootable Helix installer ISO"
     cmds:
-      - sudo nix run --impure --accept-flake-config --no-write-lock-file --print-build-logs 'path:.#helix-debian-bootstrap' -- --output ./artifacts
+      - sudo nix run --impure --accept-flake-config --no-write-lock-file --print-build-logs 'path:.#helix-os-base' -- --output ./artifacts
 
   test:
-    desc: "Sanity check the Debian rootfs tarball contents"
+    desc: "Sanity check the Helix installer ISO contents"
     cmds:
-      - |
-        set -euo pipefail
-        latest=$(ls -1t artifacts/helix-debian-*.tar.gz 2>/dev/null | head -n1)
-        if [ -z "$latest" ]; then
-          echo "No Debian rootfs tarball found in artifacts/. Run task build-debian first." >&2
-          exit 1
-        fi
-        tar -tzf "$latest" ./etc/os-release >/dev/null
-        tar -tzf "$latest" ./etc/shadow >/dev/null
-        tar -tzf "$latest" ./usr/sbin/sshd >/dev/null
-        echo "Checked $latest: contains os-release, shadow, and sshd."
+      - ./scripts/test-installer.sh
+
+  run-installer:
+    desc: "Boot the latest Helix installer ISO with QEMU"
+    cmds:
+      - ./scripts/run-installer.sh
 
   clean:
     desc: "Clean up old build artifacts"
     cmds:
-      - rm -rf artifacts result result-*
+      - sudo rm -rf artifacts result result-*
       - nix store gc

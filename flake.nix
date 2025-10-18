@@ -24,7 +24,7 @@
       };
 
       packages.${system} = {
-        helix-debian-bootstrap = pkgs.callPackage ./pkgs/helix-debian-bootstrap.nix {};
+        helix-os-base = pkgs.callPackage ./flakes/helix-os-base.nix {};
         helix-installer = pkgs.callPackage ./pkgs/helix-installer.nix {};
       };
 

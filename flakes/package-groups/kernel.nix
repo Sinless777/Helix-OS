@@ -1,0 +1,4 @@
+[
+  "initramfs-tools"
+  "linux-base"
+]

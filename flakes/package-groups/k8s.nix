@@ -1,0 +1,17 @@
+[
+  "rke2"
+  "kubectl"
+  "helm"
+  "k9s"
+  "kustomize"
+  "rancher"
+  "docker"
+  "containerd"
+  "crictl"
+  "cni-plugins"
+  "etcdctl"
+  "cilium-cli"
+  "stern"
+  "minio"
+  "istioctl"
+]

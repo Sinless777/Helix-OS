@@ -1,0 +1,13 @@
+[
+  "firejail"
+  "bubblewrap"
+  "cgroups"
+  "apparmor"
+  "seccomp"
+  "namespaces"
+  "qemu"
+  "kvm"
+  "virt-manager"
+  "gnome-boxes"
+  "flatpak"
+]
